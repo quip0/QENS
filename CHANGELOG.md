@@ -5,6 +5,24 @@ All notable changes to QENS are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+**Visualization**
+- Fixed poor readability across all visualization outputs — titles, labels, legends, and node markers were too small to read at typical display sizes
+- Decoding graph (`draw_decoding_graph`) no longer resembles a traveling-salesman-problem diagram: nodes now display index labels, edges show weight annotations, matching edges are clearly distinguished from structural edges, and boundary nodes have better spacing
+- Lattice view (`draw_lattice`) had cramped layout with thin, low-contrast elements — increased margins, marker sizes, outline widths, and made active syndromes fully opaque with thicker borders
+- Circuit diagram (`draw_circuit`) gates and labels were too small and tightly packed — increased column/row spacing, gate sizes, control dot sizes, and line widths
+- Threshold and stats plots had undersized markers, thin lines, and small axis labels
+
+### Changed
+
+**Visualization**
+- Default DPI for saved figures increased from 150 to 200
+- Default style sizes increased: font 9→11, qubit markers 300→450, ancilla markers 200→320, edge width 1.5→2.0
+- Removed pre-generated example images from the repository; images are now generated on demand by running the example scripts
+
 ## [0.1.0] - 2026-03-27
 
 ### Added

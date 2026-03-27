@@ -40,10 +40,10 @@ class QENSStyle:
     grid_color: str = "#ECF0F1"
 
     # Sizes
-    qubit_size: float = 300.0
-    ancilla_size: float = 200.0
-    edge_width: float = 1.5
-    font_size: float = 9.0
+    qubit_size: float = 450.0
+    ancilla_size: float = 320.0
+    edge_width: float = 2.0
+    font_size: float = 11.0
 
     # Stats plot colors (for threshold curves at different distances)
     distance_colors: tuple[str, ...] = (

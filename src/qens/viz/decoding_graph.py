@@ -45,7 +45,7 @@ def draw_decoding_graph(
     except NotImplementedError:
         fig, ax = plt.subplots()
         ax.text(0.5, 0.5, "Decoder does not provide a decoding graph",
-                ha="center", va="center", fontsize=12)
+                ha="center", va="center", fontsize=s.font_size)
         ax.axis("off")
         return FigureHandle(fig=fig, axes=ax)
 
@@ -59,12 +59,12 @@ def draw_decoding_graph(
         ax.axis("off")
         return FigureHandle(fig=fig, axes=ax)
 
-    # Layout: use code coordinates if available, else circular layout
+    # --- Node positioning ---
+    # Use stabilizer qubit positions from the code lattice for grid alignment
     code = decoder.code
     code_coords = code.qubit_coordinates()
     stabs = code.stabilizer_generators()
 
-    # Position nodes using stabilizer qubit positions (average of support)
     pos: dict[int, tuple[float, float]] = {}
     for i, stab in enumerate(stabs):
         if i in [n for n in nodes if n not in boundary_nodes]:
@@ -74,17 +74,17 @@ def draw_decoding_graph(
                 avg_x = sum(c[1] for c in qubit_coords) / len(qubit_coords)
                 pos[i] = (avg_x, avg_y)
 
-    # Place boundary nodes at the edge
-    for bn in boundary_nodes:
-        if pos:
-            all_x = [p[0] for p in pos.values()]
-            all_y = [p[1] for p in pos.values()]
-            pos[bn] = (max(all_x) + 1.5, np.mean(all_y))
-        else:
-            pos[bn] = (0, 0)
+    # Place boundary nodes clearly outside the lattice
+    if boundary_nodes and pos:
+        all_x = [p[0] for p in pos.values()]
+        all_y = [p[1] for p in pos.values()]
+        x_max, y_mid = max(all_x), np.mean(all_y)
+        for j, bn in enumerate(sorted(boundary_nodes)):
+            offset = (j - (len(boundary_nodes) - 1) / 2) * 0.8
+            pos[bn] = (x_max + 2.0, y_mid + offset)
 
     if figsize is None:
-        figsize = (8, 6)
+        figsize = (10, 7)
 
     fig, ax = plt.subplots(1, 1, figsize=figsize)
     ax.set_aspect("equal")
@@ -96,36 +96,59 @@ def draw_decoding_graph(
     if syndrome is not None:
         defects = set(np.nonzero(syndrome)[0].tolist())
 
-    # Draw edges
+    # Collect matching edges for highlighting
+    matching_set: set[frozenset[int]] = set()
+    if show_matching and decode_result and "matching" in decode_result.metadata:
+        for match in decode_result.metadata["matching"]:
+            matching_set.add(frozenset((match[0], match[1])))
+
+    # --- Draw edges ---
     for edge_data in edges:
         if isinstance(edge_data, dict):
             u, v = edge_data["from"], edge_data["to"]
+            weight = edge_data.get("weight", 1.0)
         else:
             u, v = edge_data[0], edge_data[1]
+            weight = 1.0
 
-        if u in pos and v in pos:
-            x0, y0 = pos[u]
-            x1, y1 = pos[v]
+        if u not in pos or v not in pos:
+            continue
+
+        x0, y0 = pos[u]
+        x1, y1 = pos[v]
+
+        is_matched = frozenset((u, v)) in matching_set
+
+        if is_matched:
+            # Matching edge: bold orange
             ax.plot(
                 [x0, x1], [y0, y1],
-                color=s.graph_edge_color, linewidth=1.0,
-                alpha=0.4, zorder=0,
+                color=s.matching_edge_color, linewidth=3.5,
+                alpha=0.9, zorder=2, solid_capstyle="round",
+            )
+        else:
+            # Normal edge: subtle, clean
+            ax.plot(
+                [x0, x1], [y0, y1],
+                color=s.graph_edge_color, linewidth=1.5,
+                alpha=0.35, zorder=0,
             )
 
-    # Draw matching edges (if available from decode result)
-    if show_matching and decode_result and "matching" in decode_result.metadata:
-        for match in decode_result.metadata["matching"]:
-            a, b = match[0], match[1]
-            if a in pos and b in pos:
-                x0, y0 = pos[a]
-                x1, y1 = pos[b]
-                ax.plot(
-                    [x0, x1], [y0, y1],
-                    color=s.matching_edge_color, linewidth=3.0,
-                    alpha=0.8, zorder=1,
-                )
+        # Edge weight label at midpoint
+        mx, my = (x0 + x1) / 2, (y0 + y1) / 2
+        ax.text(
+            mx, my, f"{weight:.1f}",
+            ha="center", va="center",
+            fontsize=s.font_size - 3,
+            color=s.graph_edge_color,
+            alpha=0.6, zorder=1,
+            bbox=dict(
+                boxstyle="round,pad=0.1",
+                facecolor=s.background_color, edgecolor="none", alpha=0.8,
+            ),
+        )
 
-    # Draw nodes
+    # --- Draw nodes ---
     for node in nodes:
         if node not in pos:
             continue
@@ -134,24 +157,44 @@ def draw_decoding_graph(
         if node in boundary_nodes:
             color = s.boundary_node_color
             marker = "D"
-            size = 80
+            size = s.ancilla_size * 0.7
+            edge_color = s.boundary_node_color
+            lw = 2.0
         elif node in defects:
             color = s.defect_color
             marker = "o"
-            size = 120
+            size = s.qubit_size * 0.6
+            edge_color = "#C0392B"
+            lw = 2.0
         else:
             color = s.graph_edge_color
             marker = "o"
-            size = 50
+            size = s.ancilla_size * 0.5
+            edge_color = s.text_color
+            lw = 1.0
 
-        ax.scatter(x, y, c=color, s=size, marker=marker,
-                   edgecolors=s.text_color, linewidths=0.5, zorder=2)
+        ax.scatter(
+            x, y, c=color, s=size, marker=marker,
+            edgecolors=edge_color, linewidths=lw, zorder=5,
+        )
+
+        # Node index label
+        label_color = "white" if node in defects else s.text_color
+        ax.text(
+            x, y, str(node), ha="center", va="center",
+            fontsize=s.font_size - 2, color=label_color,
+            fontweight="bold", zorder=6,
+        )
 
     # Title
     title_text = title or f"Decoding Graph — {code.name}"
     if defects:
-        title_text += f" ({len(defects)} defects)"
-    ax.set_title(title_text, fontsize=s.font_size + 2, color=s.text_color, pad=10)
+        title_text += f"  ({len(defects)} defect{'s' if len(defects) != 1 else ''})"
+    ax.set_title(
+        title_text,
+        fontsize=s.font_size + 3, color=s.text_color, pad=14,
+        fontweight="bold",
+    )
 
     # Legend
     legend_elements = [
@@ -163,8 +206,11 @@ def draw_decoding_graph(
         legend_elements.append(
             mpatches.Patch(facecolor=s.matching_edge_color, label="Matching edge")
         )
-    ax.legend(handles=legend_elements, loc="upper right",
-              fontsize=s.font_size - 1, framealpha=0.9)
+    ax.legend(
+        handles=legend_elements, loc="upper right",
+        fontsize=s.font_size - 1, framealpha=0.95,
+        edgecolor=s.grid_color, fancybox=True,
+    )
 
     fig.tight_layout()
     return FigureHandle(fig=fig, axes=ax)

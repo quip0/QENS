@@ -48,13 +48,13 @@ def draw_lattice(
 
     all_x = [c[1] for c in coords.values()]
     all_y = [c[0] for c in coords.values()]
-    margin = 1.0
+    margin = 1.5
 
     if figsize is None:
         span_x = max(all_x) - min(all_x) + 2 * margin
         span_y = max(all_y) - min(all_y) + 2 * margin
-        scale = 1.5
-        figsize = (max(4, span_x * scale), max(4, span_y * scale))
+        scale = 2.0
+        figsize = (max(6, span_x * scale), max(5, span_y * scale))
 
     fig, ax = plt.subplots(1, 1, figsize=figsize)
     ax.set_xlim(min(all_x) - margin, max(all_x) + margin)
@@ -72,7 +72,7 @@ def draw_lattice(
                 ax.plot(
                     [ca[1], cb[1]], [ca[0], cb[0]],
                     color=s.grid_color, linewidth=s.edge_width,
-                    zorder=0, alpha=0.6,
+                    zorder=0, alpha=0.7,
                 )
 
     # Classify nodes
@@ -97,10 +97,10 @@ def draw_lattice(
             color = s.data_qubit_color
 
         ax.scatter(x, y, c=color, s=s.qubit_size, zorder=2,
-                   edgecolors=s.text_color, linewidths=0.8)
+                   edgecolors=s.text_color, linewidths=1.2)
         if show_labels:
             ax.text(x, y, str(q_idx), ha="center", va="center",
-                    fontsize=s.font_size - 1, color="white",
+                    fontsize=s.font_size, color="white",
                     fontweight="bold", zorder=3)
 
     # Draw ancilla qubits (stabilizer nodes)
@@ -124,27 +124,33 @@ def draw_lattice(
             if syndrome is not None and i < len(syndrome) and syndrome[i]:
                 color = s.syndrome_active
                 marker = "s"
-                size = s.ancilla_size * 1.3
+                size = s.ancilla_size * 1.4
+                alpha = 1.0
+                lw = 2.0
             else:
                 color = base_color
                 marker = "s"
                 size = s.ancilla_size
+                alpha = 0.8
+                lw = 1.2
 
             ax.scatter(x, y, c=color, s=size, marker=marker,
-                       zorder=2, edgecolors=s.text_color, linewidths=0.8,
-                       alpha=0.7)
+                       zorder=2, edgecolors=s.text_color, linewidths=lw,
+                       alpha=alpha)
 
     # Title
     if title:
-        ax.set_title(title, fontsize=s.font_size + 2, color=s.text_color, pad=10)
+        ax.set_title(title, fontsize=s.font_size + 3, color=s.text_color,
+                     pad=14, fontweight="bold")
     else:
-        ax.set_title(code.name, fontsize=s.font_size + 2, color=s.text_color, pad=10)
+        ax.set_title(code.name, fontsize=s.font_size + 3, color=s.text_color,
+                     pad=14, fontweight="bold")
 
     # Legend
     legend_elements = [
         mpatches.Patch(facecolor=s.data_qubit_color, label="Data qubit"),
-        mpatches.Patch(facecolor=s.ancilla_x_color, alpha=0.7, label="X stabilizer"),
-        mpatches.Patch(facecolor=s.ancilla_z_color, alpha=0.7, label="Z stabilizer"),
+        mpatches.Patch(facecolor=s.ancilla_x_color, alpha=0.8, label="X stabilizer"),
+        mpatches.Patch(facecolor=s.ancilla_z_color, alpha=0.8, label="Z stabilizer"),
     ]
     if syndrome is not None:
         legend_elements.append(
@@ -157,7 +163,8 @@ def draw_lattice(
             mpatches.Patch(facecolor=s.error_z_color, label="Z error"),
         ])
     ax.legend(handles=legend_elements, loc="upper right",
-              fontsize=s.font_size - 1, framealpha=0.9)
+              fontsize=s.font_size, framealpha=0.95,
+              edgecolor=s.grid_color, fancybox=True)
 
     fig.tight_layout()
     return FigureHandle(fig=fig, axes=ax)

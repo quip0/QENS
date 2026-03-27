@@ -15,7 +15,7 @@ class FigureHandle:
     fig: matplotlib.figure.Figure
     axes: Any  # matplotlib Axes or array of Axes
 
-    def save(self, path: str, dpi: int = 150, **kwargs: Any) -> None:
+    def save(self, path: str, dpi: int = 200, **kwargs: Any) -> None:
         self.fig.savefig(path, dpi=dpi, bbox_inches="tight", **kwargs)
 
     def show(self) -> None:
