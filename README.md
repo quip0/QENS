@@ -7,16 +7,35 @@ QENS provides a layered API for researchers, educators, and engineers working wi
 ## Installation
 
 ```bash
-pip install -e .
+pip install qens
 ```
 
 For development (includes pytest, mypy, ruff):
 
 ```bash
+git clone https://github.com/quipo/qens.git
+cd qens
 pip install -e ".[dev]"
 ```
 
 Requires Python 3.11+.
+
+## Documentation
+
+Full documentation is in the [`docs/`](docs/) directory:
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/getting-started.md) | Installation, first simulation, project structure |
+| [Core Concepts](docs/concepts.md) | QEC background, Pauli errors, CSS codes, Pauli frame model |
+| [Error Models](docs/error-models.md) | All 10 noise models with examples |
+| [QEC Codes](docs/codes.md) | Repetition, surface, and color codes |
+| [Decoders](docs/decoders.md) | Lookup, MWPM, and union-find decoders |
+| [Simulation](docs/simulation.md) | Monte Carlo sampling, threshold sweeps, Pauli frame simulator |
+| [Visualization](docs/visualization.md) | Circuit diagrams, lattice views, decoding graphs, plots |
+| [Extending QENS](docs/extending.md) | Custom error models, codes, decoders, visualizers |
+| [API Reference](docs/api-reference.md) | Complete reference for every class and function |
+| [Architecture](docs/architecture.md) | Package design, dependency graph, simulation pipeline |
 
 ---
 
