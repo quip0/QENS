@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Quantum Error and Noise Simulation SDK</strong> -- a Python-native toolkit for simulating quantum errors, decoding syndromes, and visualizing error-correcting codes.
+  <strong>Quantum Error & Noise Simulator.</strong> A Python-native toolkit for simulating quantum errors, decoding syndromes, and visualizing error-correcting codes.
 </p>
 
 QENS provides a layered API for researchers, educators, and engineers working with quantum error correction. It ships with built-in support for surface codes, repetition codes, and color codes, multiple decoder implementations, and publication-quality visualization -- all with only `numpy` and `matplotlib` as dependencies.
