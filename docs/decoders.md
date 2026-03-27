@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Decoders Guide
 
 This guide covers the three decoders shipped with QENS: the lookup table

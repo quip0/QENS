@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Extension Guide
 
 QENS is designed from the ground up to be extensible. Every major subsystem follows the same **Abstract Base Class + Registry** pattern, making it straightforward to add custom error models, quantum error-correcting codes, decoders, and visualizers without modifying the core library.

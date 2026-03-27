@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # API Reference
 
 Complete API reference for the QENS SDK, organized by module.

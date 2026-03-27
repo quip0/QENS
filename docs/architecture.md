@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Architecture
 
 This document describes the internal architecture of QENS for contributors and advanced users.

@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Error Models Guide
 
 This guide covers every noise model in the QENS SDK, from simple Pauli errors

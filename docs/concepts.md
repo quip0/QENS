@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Core Concepts
 
 This page introduces the quantum error correction concepts you need to use QENS effectively. If you are already familiar with QEC, skip to the [API Reference](api-reference.md).

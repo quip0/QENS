@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Simulation Guide
 
 This guide covers the simulation infrastructure in QENS: the `NoisySampler`

@@ -1,6 +1,10 @@
-# QENS
+<p align="center">
+  <img src="images/logo/widelogo.svg" width="600" alt="QENS">
+</p>
 
-**Quantum Error and Noise Simulation SDK** -- a Python-native toolkit for simulating quantum errors, decoding syndromes, and visualizing error-correcting codes.
+<p align="center">
+  <strong>Quantum Error and Noise Simulation SDK</strong> -- a Python-native toolkit for simulating quantum errors, decoding syndromes, and visualizing error-correcting codes.
+</p>
 
 QENS provides a layered API for researchers, educators, and engineers working with quantum error correction. It ships with built-in support for surface codes, repetition codes, and color codes, multiple decoder implementations, and publication-quality visualization -- all with only `numpy` and `matplotlib` as dependencies.
 
@@ -40,7 +44,7 @@ print(f"Logical error rate: {result.logical_error_rate:.4f}")
   <img src="images/quickstart_lattice.png" width="500" alt="Repetition code lattice visualization">
 </p>
 
-## Documentation
+## <img src="images/logo/iconlogo.svg" width="28" alt="" align="top"> Documentation
 
 Full documentation is in the [`docs/`](docs/) directory:
 
@@ -57,7 +61,7 @@ Full documentation is in the [`docs/`](docs/) directory:
 | [API Reference](docs/api-reference.md) | Complete reference for every class and function |
 | [Architecture](docs/architecture.md) | Package design, dependency graph, simulation pipeline |
 
-## Feature Highlights
+## <img src="images/logo/iconlogo.svg" width="28" alt="" align="top"> Feature Highlights
 
 - **Circuits** -- Fluent builder API for quantum circuits (`Circuit(3).h(0).cx(0, 1).measure_all()`)
 - **Error Models** -- 10 built-in noise models (depolarizing, bit-flip, phase-flip, measurement, crosstalk, leakage, correlated Pauli, and more) with composition support. See [Error Models](docs/error-models.md).
@@ -75,7 +79,7 @@ Full documentation is in the [`docs/`](docs/) directory:
   <img src="images/surface_threshold.png" width="600" alt="Surface code threshold plot">
 </p>
 
-## Architecture
+## <img src="images/logo/iconlogo.svg" width="28" alt="" align="top"> Architecture
 
 ```
 qens/

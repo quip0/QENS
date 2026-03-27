@@ -1,12 +1,18 @@
-# QENS Documentation
+<p align="center">
+  <img src="../images/logo/widelogo.svg" width="600" alt="QENS">
+</p>
 
-**Quantum Error and Noise Simulation SDK** -- simulate quantum errors, decode syndromes, and visualize error-correcting codes in pure Python.
+<p align="center">
+  <strong>Quantum Error and Noise Simulation SDK</strong> -- simulate quantum errors, decode syndromes, and visualize error-correcting codes in pure Python.
+</p>
 
-Version 0.1.0 | [GitHub](https://github.com/quip0/QENS) | [MIT License](../LICENSE)
+<p align="center">
+  Version 0.1.0 | <a href="https://github.com/quip0/QENS">GitHub</a> | <a href="../LICENSE">MIT License</a>
+</p>
 
 ---
 
-## Key Features
+## <img src="../images/logo/iconlogo.svg" width="24" alt="" align="top"> Key Features
 
 - **Error simulation** -- 8 built-in noise models covering Pauli, measurement, gate, correlated, and leakage errors, with composition support
 - **QEC codes** -- Surface codes, repetition codes, and color codes with stabilizer generators, check matrices, and syndrome circuits
@@ -31,7 +37,7 @@ print(f"Logical error rate: {result.logical_error_rate:.4f}")
 
 ---
 
-## Documentation Map
+## <img src="../images/logo/iconlogo.svg" width="24" alt="" align="top"> Documentation Map
 
 ### Getting Started
 

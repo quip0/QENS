@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Getting Started
 
 This guide walks you through installing QENS and running your first quantum error correction simulation.
@@ -189,7 +191,7 @@ src/qens/
 
 ---
 
-## Next Steps
+## <img src="../images/logo/iconlogo.svg" width="24" alt="" align="top"> Next Steps
 
 - [Core Concepts](concepts.md) -- Background on quantum error correction
 - [Error Models](error-models.md) -- All noise model types and composition

@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Visualization Guide
 
 This guide covers the visualization functions in QENS: circuit diagrams,

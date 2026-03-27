@@ -1,3 +1,5 @@
+<img src="../images/logo/compactlogo.svg" width="200" alt="QENS">
+
 # Error-Correcting Codes Guide
 
 This guide covers the quantum error-correcting codes available in QENS:
