@@ -63,6 +63,6 @@ fig_handle = plot_threshold(
     result,
     title="Surface Code Threshold (MWPM Decoder)",
 )
-fig_handle.save("surface_threshold.png")
+fig_handle.save("images/surface_threshold.png")
 fig_handle.close()
-print("\nThreshold plot saved to surface_threshold.png")
+print("\nThreshold plot saved to images/surface_threshold.png")

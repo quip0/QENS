@@ -13,17 +13,17 @@ This guide walks you through installing QENS and running your first quantum erro
 
 ## Installation
 
-Clone the repository and install in editable mode:
+Install from PyPI:
 
 ```bash
-git clone https://github.com/quip0/QENS.git
-cd QENS
-pip install -e .
+pip install qens
 ```
 
-For development (adds pytest, mypy, ruff):
+For development (editable install with pytest, mypy, ruff):
 
 ```bash
+git clone https://github.com/quipo/qens.git
+cd qens
 pip install -e ".[dev]"
 ```
 

@@ -44,9 +44,9 @@ fig = draw_lattice(
     error=error,
     title="Repetition Code (d=5) — Syndrome + Error",
 )
-fig.save("gallery_rep_lattice.png")
+fig.save("images/gallery_rep_lattice.png")
 fig.close()
-print("     -> gallery_rep_lattice.png")
+print("     -> images/gallery_rep_lattice.png")
 
 # ---------------------------------------------------------------
 # 2. Surface code lattice with error overlay
@@ -65,9 +65,9 @@ fig = draw_lattice(
     error=surf_error,
     title="Surface Code (d=3) — Error Overlay",
 )
-fig.save("gallery_surface_lattice.png")
+fig.save("images/gallery_surface_lattice.png")
 fig.close()
-print("     -> gallery_surface_lattice.png")
+print("     -> images/gallery_surface_lattice.png")
 
 # ---------------------------------------------------------------
 # 3. Surface code syndrome extraction circuit
@@ -76,9 +76,9 @@ print("3/5  Surface code syndrome circuit diagram...")
 
 circuit = surf_code.syndrome_circuit(rounds=1)
 fig = draw_circuit(circuit)
-fig.save("gallery_circuit.png")
+fig.save("images/gallery_circuit.png")
 fig.close()
-print("     -> gallery_circuit.png")
+print("     -> images/gallery_circuit.png")
 
 # ---------------------------------------------------------------
 # 4. Decoding graph with matching
@@ -98,9 +98,9 @@ fig = draw_decoding_graph(
     show_matching=True,
     title="Decoding Graph with Matching (d=3)",
 )
-fig.save("gallery_decoding_graph.png")
+fig.save("images/gallery_decoding_graph.png")
 fig.close()
-print("     -> gallery_decoding_graph.png")
+print("     -> images/gallery_decoding_graph.png")
 
 # ---------------------------------------------------------------
 # 5. Threshold plot from mock data
@@ -130,8 +130,8 @@ mock_result = ThresholdResult(
 )
 
 fig = plot_threshold(mock_result, title="Threshold Plot (Mock Data)")
-fig.save("gallery_threshold.png")
+fig.save("images/gallery_threshold.png")
 fig.close()
-print("     -> gallery_threshold.png")
+print("     -> images/gallery_threshold.png")
 
 print("\nAll gallery images saved.")
