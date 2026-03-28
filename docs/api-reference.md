@@ -539,16 +539,21 @@ Wrapper around matplotlib figure objects returned by all visualization functions
 - `fig: Figure` -- The matplotlib Figure
 - `axes: Axes | list[Axes]` -- The axes (single or list)
 
-#### `QENSStyle(data_color: str = "#2196F3", ancilla_color: str = "#4CAF50", error_color: str = "#F44336", correction_color: str = "#FF9800", background: str = "#FAFAFA")`
+#### `QENSStyle`
 
-Configurable color palette for all QENS visualizations.
+Configurable color palette and sizing for all QENS visualizations. Frozen dataclass.
 
-**Fields:**
-- `data_color: str` -- Color for data qubits
-- `ancilla_color: str` -- Color for ancilla qubits
-- `error_color: str` -- Color for error highlights
-- `correction_color: str` -- Color for decoder corrections
-- `background: str` -- Background color
+**Key fields:**
+- `data_qubit_color: str` -- Fill color for data qubits (`"#4A90D9"`)
+- `ancilla_x_color: str` -- Fill color for X-type ancilla markers (`"#E74C3C"`)
+- `ancilla_z_color: str` -- Fill color for Z-type ancilla markers (`"#2ECC71"`)
+- `error_x_color / error_y_color / error_z_color: str` -- Colors for X, Y, Z errors
+- `syndrome_active: str` -- Color for active syndrome bits (`"#E74C3C"`)
+- `color_code_plaquette_colors: tuple[str, str, str]` -- 3-color palette for color codes (`("tomato", "yellowgreen", "steelblue")`)
+- `background_color: str` -- Figure background (`"#FFFFFF"`)
+- `text_color: str` -- Text label color (`"#2C3E50"`)
+
+See the [Visualization Guide](visualization.md#customizing-style) for the full field list.
 
 #### `draw_circuit(circuit: Circuit, errors: PauliString | None = None, style: QENSStyle | None = None, **kwargs) -> FigureHandle`
 

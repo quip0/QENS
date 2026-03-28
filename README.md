@@ -40,10 +40,6 @@ result = qens.ThresholdExperiment.single_point(
 print(f"Logical error rate: {result.logical_error_rate:.4f}")
 ```
 
-<p align="center">
-  <img src="images/quickstart_lattice.png" width="500" alt="Repetition code lattice visualization">
-</p>
-
 ## <img src="images/logo/iconlogo.svg" width="28" alt="" align="top"> Documentation
 
 Full documentation is in the [`docs/`](docs/) directory:
@@ -71,12 +67,36 @@ Full documentation is in the [`docs/`](docs/) directory:
 - **Visualization** -- Circuit diagrams, lattice views, decoding graphs, and statistical plots. See [Visualization](docs/visualization.md).
 - **Extensible** -- ABC + Registry pattern for adding custom error models, codes, and decoders. See [Extending QENS](docs/extending.md).
 
+### Lattice Views
+
 <p align="center">
-  <img src="images/gallery_surface_lattice.png" width="400" alt="Surface code lattice">
-  <img src="images/gallery_decoding_graph.png" width="400" alt="Decoding graph">
+  <img src="images/clean_d5.png" width="220" alt="Surface code d=5">
+  <img src="images/surface_d3_syndrome.png" width="180" alt="Surface code d=3 with syndrome">
+  <img src="images/surface_d3_errors.png" width="180" alt="Surface code d=3 with errors">
+  <img src="images/rep_d5_lattice.png" width="180" alt="Repetition code d=5">
+</p>
+
+### Color Codes
+
+<p align="center">
+  <img src="images/color_488_d3.png" width="250" alt="Color code 4.8.8 d=3">
+  <img src="images/color_666_d3.png" width="250" alt="Color code 6.6.6 d=3">
+</p>
+
+### Circuits & Decoding
+
+<p align="center">
+  <img src="images/syndrome_circuit.png" width="400" alt="Syndrome extraction circuit">
 </p>
 <p align="center">
-  <img src="images/surface_threshold.png" width="600" alt="Surface code threshold plot">
+  <img src="images/decoding_graph.png" width="300" alt="MWPM decoding graph">
+</p>
+
+### Statistical Plots
+
+<p align="center">
+  <img src="images/threshold_plot.png" width="300" alt="Threshold plot">
+  <img src="images/logical_rates.png" width="280" alt="Logical error rates">
 </p>
 
 ## <img src="images/logo/iconlogo.svg" width="28" alt="" align="top"> Architecture

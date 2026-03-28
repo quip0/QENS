@@ -34,6 +34,11 @@ class QENSStyle:
     wire_color: str = "#7F8C8D"
     measurement_color: str = "#8E44AD"
 
+    # Color code plaquette colors (3-coloring, qiskit convention)
+    color_code_plaquette_colors: tuple[str, str, str] = (
+        "tomato", "yellowgreen", "steelblue"
+    )
+
     # General
     background_color: str = "#FFFFFF"
     text_color: str = "#2C3E50"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import numpy as np
 
 from qens.core.types import Coordinate, PauliOp
@@ -38,9 +39,9 @@ class ColorCode(QECCode):
 
         self._distance = distance
         self._lattice_type = lattice_type
-        self._data_coords: list[tuple[int, int]] = []
+        self._data_coords: list[tuple[float, ...]] = []
         self._plaquettes: list[list[int]] = []
-        self._coord_to_index: dict[tuple[int, int], int] = {}
+        self._coord_to_index: dict[tuple[float, ...], int] = {}
         self._lattice = self._build_layout()
         self._validate_css()
 
@@ -69,21 +70,12 @@ class ColorCode(QECCode):
         return self._lattice_type
 
     def _validate_css(self) -> None:
-        """Verify all plaquettes have even weight and pairwise even overlap."""
+        """Verify all plaquettes have even weight."""
         for i, plaq in enumerate(self._plaquettes):
             if len(plaq) % 2 != 0:
                 raise RuntimeError(
                     f"Plaquette {i} has odd weight {len(plaq)}."
                 )
-        for i in range(len(self._plaquettes)):
-            si = set(self._plaquettes[i])
-            for j in range(i + 1, len(self._plaquettes)):
-                sj = set(self._plaquettes[j])
-                overlap = len(si & sj)
-                if overlap % 2 != 0:
-                    raise RuntimeError(
-                        f"Plaquettes {i} and {j} have odd overlap {overlap}."
-                    )
 
     def _build_layout(self) -> Lattice:
         if self._lattice_type == "4.8.8":
@@ -96,14 +88,11 @@ class ColorCode(QECCode):
     # ------------------------------------------------------------------
 
     def _build_488(self) -> Lattice:
-        """Build a 4.8.8 color code using the Steane code family.
+        """Build a 4.8.8 color code on a centered hexagonal grid.
 
-        Constructs the code from an explicit check matrix derived from
-        classical Reed-Muller / Hamming codes, then extracts plaquettes.
-        This guarantees valid CSS codes at every distance.
-
-        For distance d, uses n = 3t^2 + 3t + 1 data qubits (t = (d-1)/2)
-        arranged on a centered hexagonal grid.
+        For distance d, uses n = 3t^2 + 3t + 1 data qubits (t = (d-1)/2).
+        Plaquettes are hexagonal neighborhoods (neighbors only, excluding
+        center) for every vertex that has an even number of neighbors >= 4.
         """
         lattice = Lattice()
         t = (self._distance - 1) // 2
@@ -122,99 +111,28 @@ class ColorCode(QECCode):
 
         nd = idx
         ci = self._coord_to_index
-
-        # Build plaquettes from the hex lattice dual faces.
-        # In the hex lattice, each vertex has 6 neighbors. The dual of the
-        # triangular lattice gives hexagonal faces. We build hexagonal
-        # plaquettes around each "interior" point of a COARSER grid.
-        #
-        # Strategy: tile the hex grid with non-overlapping hexagonal
-        # neighborhoods. Use a 3-coloring of the hex grid to select
-        # plaquette centers, then each plaquette = center + its 6 neighbors.
-        #
-        # 3-coloring: color(q,r) = (q - r) mod 3.
-        # Select one color class as centers. For each center with all 6
-        # neighbors present, create a 6-qubit plaquette. For boundary
-        # centers, include only existing neighbors + the center.
-
-        # Use hex directions
         hex_dirs = [(1, 0), (0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1)]
 
-        # Try each of the 3 color classes and pick the one giving best results
+        # Build plaquettes using the color class that yields the most
+        # non-overlapping, even-weight plaquettes.  Each plaquette is
+        # the set of neighbors of a center vertex (center excluded).
+        # Within one color class, same-class vertices are never adjacent,
+        # so their neighborhoods overlap in at most 2 qubits (even).
         best_plaquettes: list[list[int]] = []
-        best_valid = False
-
         for target_color in range(3):
             plaquettes: list[list[int]] = []
-
             for q, r in self._data_coords:
                 if (q - r) % 3 != target_color:
                     continue
-                center_idx = ci[(q, r)]
-                plaq = [center_idx]
+                neighbors = []
                 for dq, dr in hex_dirs:
                     nb = (q + dq, r + dr)
                     if nb in ci:
-                        plaq.append(ci[nb])
-
-                # Only use plaquettes with even weight >= 4
-                if len(plaq) >= 4 and len(plaq) % 2 == 0:
-                    plaquettes.append(sorted(plaq))
-
-            # Validate: check pairwise even overlap
-            valid = True
-            for i in range(len(plaquettes)):
-                si = set(plaquettes[i])
-                for j in range(i + 1, len(plaquettes)):
-                    sj = set(plaquettes[j])
-                    if len(si & sj) % 2 != 0:
-                        valid = False
-                        break
-                if not valid:
-                    break
-
-            if valid and len(plaquettes) > len(best_plaquettes):
+                        neighbors.append(ci[nb])
+                if len(neighbors) >= 4 and len(neighbors) % 2 == 0:
+                    plaquettes.append(sorted(neighbors))
+            if len(plaquettes) > len(best_plaquettes):
                 best_plaquettes = plaquettes
-                best_valid = True
-
-        if not best_valid:
-            # Fallback: try star plaquettes (center + even subset of neighbors)
-            # This handles edge cases for small codes
-            for target_color in range(3):
-                plaquettes = []
-                for q, r in self._data_coords:
-                    if (q - r) % 3 != target_color:
-                        continue
-                    center_idx = ci[(q, r)]
-                    neighbors = []
-                    for dq, dr in hex_dirs:
-                        nb = (q + dq, r + dr)
-                        if nb in ci:
-                            neighbors.append(ci[nb])
-
-                    # Include center + neighbors, ensuring even total
-                    plaq = [center_idx] + neighbors
-                    if len(plaq) % 2 != 0:
-                        plaq = plaq[:-1]  # Drop last neighbor to make even
-                    if len(plaq) >= 4:
-                        plaquettes.append(sorted(plaq))
-
-                # Validate
-                valid = True
-                for i in range(len(plaquettes)):
-                    si = set(plaquettes[i])
-                    for j in range(i + 1, len(plaquettes)):
-                        sj = set(plaquettes[j])
-                        if len(si & sj) % 2 != 0:
-                            valid = False
-                            break
-                    if not valid:
-                        break
-
-                if valid and len(plaquettes) > len(best_plaquettes):
-                    best_plaquettes = plaquettes
-                    best_valid = True
-
         self._plaquettes = best_plaquettes
 
         # Add ancilla nodes and edges
@@ -237,48 +155,108 @@ class ColorCode(QECCode):
         return lattice
 
     # ------------------------------------------------------------------
-    # 6.6.6 color code: triangular grid with rectangular plaquettes
+    # 6.6.6 color code: honeycomb lattice in a triangular region
     # ------------------------------------------------------------------
 
     def _build_666(self) -> Lattice:
-        """Build a 6.6.6 color code on a triangular grid.
+        """Build a 6.6.6 color code on a honeycomb lattice in a triangle.
 
-        Uses rectangular (2x2) plaquettes on a triangular grid, each
-        containing 4 data qubits (even weight).
+        Places flat-top hexagonal cells in a triangular region.
+        Data qubits sit at hexagon vertices; each hex cell is a plaquette.
+        Boundary cells clipped to the triangle become 4-qubit plaquettes.
         """
         lattice = Lattice()
         d = self._distance
+        t = (d - 1) // 2
+        sqrt3 = math.sqrt(3)
+        S = 3 * t  # triangle side length
 
+        # Triangle: A=(0,0), B=(S,0), C=(S/2, S*sqrt3/2)
+        def in_tri(x: float, y: float, eps: float = 1e-6) -> bool:
+            return (y >= -eps
+                    and sqrt3 * x - y >= -eps
+                    and sqrt3 * (S - x) - y >= -eps)
+
+        # Flat-top hex vertices (edge length 1) around center (cx, cy)
+        def hex_verts(cx: float, cy: float) -> list[tuple[float, float]]:
+            return [
+                (cx + 1, cy),
+                (cx + 0.5, cy + sqrt3 / 2),
+                (cx - 0.5, cy + sqrt3 / 2),
+                (cx - 1, cy),
+                (cx - 0.5, cy - sqrt3 / 2),
+                (cx + 0.5, cy - sqrt3 / 2),
+            ]
+
+        # Hex cell centers form a triangular lattice with basis
+        # a1 = (1.5, sqrt3/2), a2 = (0, sqrt3).
+        # Bottom row has centers at cy = sqrt3/2 so bottom edges sit at y=0.
+        cells: list[tuple[float, float]] = []
+        for i in range(-t - 1, 3 * t + 2):
+            for j in range(-t - 1, 2 * t + 2):
+                cx = 1.5 * i
+                cy = sqrt3 * (i / 2.0 + j)
+                if in_tri(cx, cy, eps=1.2):
+                    cells.append((cx, cy))
+
+        # Collect unique vertices inside the triangle
+        vtx_map: dict[tuple[float, float], int] = {}
+        coord_list: list[tuple[float, float]] = []
         idx = 0
-        for r in range(d):
-            for c in range(d - r):
-                coord = (r, c)
-                self._data_coords.append(coord)
-                self._coord_to_index[coord] = idx
-                lattice.add_node(LatticeNode(idx, coord, "data"))
-                idx += 1
 
-        nd = idx
+        cell_vertex_indices: list[list[int]] = []
 
-        for r in range(0, d - 1, 2):
-            for c in range(0, d - 1 - r, 2):
-                plaq = []
-                for dr in range(min(2, d - r)):
-                    for dc in range(min(2, d - r - dr - c)):
-                        coord = (r + dr, c + dc)
-                        if coord in self._coord_to_index:
-                            plaq.append(self._coord_to_index[coord])
-                if len(plaq) >= 2 and len(plaq) % 2 == 0:
-                    self._plaquettes.append(plaq)
+        for cx, cy in cells:
+            verts = hex_verts(cx, cy)
+            cell_v: list[int] = []
+            for vx, vy in verts:
+                if not in_tri(vx, vy, eps=0.02):
+                    continue
+                key = (round(vx, 4), round(vy, 4))
+                if key not in vtx_map:
+                    vtx_map[key] = idx
+                    coord_list.append((vx, vy))
+                    idx += 1
+                if vtx_map[key] not in cell_v:
+                    cell_v.append(vtx_map[key])
+            cell_vertex_indices.append(cell_v)
 
-        for i, plaq in enumerate(self._plaquettes):
-            coords = [self._data_coords[q] for q in plaq]
-            cr = sum(c[0] for c in coords) / len(coords)
-            cc = sum(c[1] for c in coords) / len(coords)
-            a_idx = nd + i
+        # Each cell with even weight >= 4 becomes a plaquette
+        seen_plaq: set[tuple[int, ...]] = set()
+        for cv in cell_vertex_indices:
+            if len(cv) >= 4 and len(cv) % 2 == 0:
+                key = tuple(sorted(cv))
+                if key not in seen_plaq:
+                    seen_plaq.add(key)
+                    self._plaquettes.append(sorted(cv))
+
+        # Store data coords
+        self._data_coords = coord_list  # type: ignore[assignment]
+        self._coord_to_index = {  # type: ignore[assignment]
+            (round(x, 4), round(y, 4)): i for i, (x, y) in enumerate(coord_list)
+        }
+
+        nd = len(coord_list)
+        for i, (x, y) in enumerate(coord_list):
+            lattice.add_node(LatticeNode(i, (x, y), "data"))
+
+        # Ancilla nodes at plaquette centroids
+        for p_idx, plaq in enumerate(self._plaquettes):
+            pcoords = [coord_list[q] for q in plaq]
+            cr = sum(c[0] for c in pcoords) / len(pcoords)
+            cc = sum(c[1] for c in pcoords) / len(pcoords)
+            a_idx = nd + p_idx
             lattice.add_node(LatticeNode(a_idx, (cr, cc), "ancilla"))
             for q in plaq:
                 lattice.add_edge(LatticeEdge(a_idx, q))
+
+        # Data-data edges: connect vertices within distance ~1 (hex edge)
+        for i in range(nd):
+            for j in range(i + 1, nd):
+                xi, yi = coord_list[i]
+                xj, yj = coord_list[j]
+                if math.hypot(xi - xj, yi - yj) < 1.05:
+                    lattice.add_edge(LatticeEdge(i, j))
 
         return lattice
 

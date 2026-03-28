@@ -61,9 +61,9 @@ fig_circuit = draw_circuit(
     noise_model=noise,
     highlight_errors=True,
 )
-fig_circuit.save("images/noisy_circuit.png")
+fig_circuit.save("output/noisy_circuit.png")
 fig_circuit.close()
-print("\nNoisy circuit diagram saved to images/noisy_circuit.png")
+print("\nNoisy circuit diagram saved to output/noisy_circuit.png")
 
 # --- 4. Run a single shot, decode, and visualize the decoding graph ---
 decoder = MWPMDecoder(code)
@@ -90,6 +90,6 @@ fig_graph = draw_decoding_graph(
     show_matching=True,
     title="Decoding Graph (d=3 Surface Code)",
 )
-fig_graph.save("images/decoding_graph.png")
+fig_graph.save("output/decoding_graph.png")
 fig_graph.close()
-print("Decoding graph saved to images/decoding_graph.png")
+print("Decoding graph saved to output/decoding_graph.png")

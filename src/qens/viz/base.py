@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from io import BytesIO
 from typing import Any
 
 import matplotlib.figure
@@ -23,6 +24,12 @@ class FigureHandle:
 
     def close(self) -> None:
         plt.close(self.fig)
+
+    def _repr_png_(self) -> bytes:
+        buf = BytesIO()
+        self.fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
+        buf.seek(0)
+        return buf.getvalue()
 
 
 class Visualizer(ABC):

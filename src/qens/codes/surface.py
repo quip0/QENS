@@ -65,7 +65,7 @@ class SurfaceCode(QECCode):
         for r in range(d):
             for c in range(d):
                 self._data_qubits.append((r, c))
-                lattice.add_node(LatticeNode(idx, (r, c), "data"))
+                lattice.add_node(LatticeNode(idx, (2 * r, 2 * c), "data"))
                 idx += 1
 
         # Plaquette ancillas sit at half-integer positions (r+0.5, c+0.5)

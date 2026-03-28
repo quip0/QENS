@@ -186,6 +186,10 @@ Z-type stabilizers.
 - `distance >= 2`
 - `distance` must be odd
 
+<p align="center">
+  <img src="../images/clean_d5.png" width="300" alt="Surface code d=5 lattice">
+</p>
+
 ### Structure
 
 For distance 3, the code has:
@@ -193,10 +197,11 @@ For distance 3, the code has:
 - **9 data qubits** arranged on a 3 x 3 grid.
 - **8 stabilizer generators** (4 X-type + 4 Z-type).
 
-Data qubits sit at integer coordinates `(r, c)` for `r, c` in `[0, d-1]`.
-Ancilla qubits sit at plaquette centers. X-stabilizers and Z-stabilizers are
-placed on alternating plaquettes, with boundary conditions ensuring the code
-has exactly one logical qubit.
+Data qubits sit at even integer coordinates `(2r, 2c)` for `r, c` in
+`[0, d-1]`. Ancilla qubits sit at plaquette centers on odd coordinates, so
+both share a unified grid. X-stabilizers (tomato) and Z-stabilizers
+(yellowgreen) are placed on alternating plaquettes, with boundary conditions
+ensuring the code has exactly one logical qubit.
 
 ### Basic Usage
 
@@ -273,69 +278,116 @@ The `ColorCode(distance, lattice_type)` implements triangular color codes.
 Color codes are CSS codes that support transversal implementation of the full
 Clifford group -- a significant advantage for fault-tolerant computation.
 
+Both X and Z stabilizers act on the same plaquette support. All plaquettes
+have even weight, and the 3-colorable plaquette structure is the defining
+feature of these codes.
+
 **Requirements:**
 - `distance >= 3`
 - `distance` must be odd
 - `lattice_type` must be `"4.8.8"` or `"6.6.6"`
 
-### 4.8.8 Lattice (Steane Code Family)
+### 4.8.8 Lattice
 
-The 4.8.8 lattice places data qubits on a centered hexagonal grid. Plaquettes
-are derived from the hex lattice structure and have even weight (typically 4
-or 6 qubits). For distance `d`, the number of data qubits is
-`n = 3t^2 + 3t + 1` where `t = (d-1)/2`.
+The 4.8.8 lattice places data qubits on a centered hexagonal grid using cube
+coordinates `(q, r)` with `max(|q|, |r|, |q+r|) <= t` where `t = (d-1)/2`.
+This gives `n = 3t^2 + 3t + 1` data qubits.
 
-```python
-from qens.codes.color import ColorCode
-
-code = ColorCode(distance=3, lattice_type="4.8.8")
-
-print(code.name)                  # Color-4.8.8-3
-print(code.num_data_qubits)       # 7 (Steane code)
-print(code.num_ancilla_qubits)    # varies by construction
-print(code.code_distance)         # 3
-print(code.supports_transversal_clifford)  # True
-
-stabs = code.stabilizer_generators()
-print(f"Total stabilizers: {len(stabs)}")
-
-# Color codes have paired X and Z stabilizers on the same plaquettes
-x_stabs = [s for s in stabs if s.stabilizer_type == "X"]
-z_stabs = [s for s in stabs if s.stabilizer_type == "Z"]
-print(f"X stabilizers: {len(x_stabs)}, Z stabilizers: {len(z_stabs)}")
-```
-
-### 6.6.6 Lattice
-
-The 6.6.6 lattice uses a triangular grid with rectangular (2x2) plaquettes,
-each containing 4 data qubits (even weight).
-
-```python
-from qens.codes.color import ColorCode
-
-code = ColorCode(distance=3, lattice_type="6.6.6")
-
-print(code.name)                  # Color-6.6.6-3
-print(code.num_data_qubits)       # 6
-print(code.num_ancilla_qubits)    # varies
-print(code.supports_transversal_clifford)  # True
-
-stabs = code.stabilizer_generators()
-for s in stabs[:4]:
-    print(f"Type={s.stabilizer_type}, qubits={s.qubits}")
-```
-
-### Distance-5 Color Code
+Plaquettes are the hexagonal neighborhoods of vertices in one color class
+(neighbors only, excluding the center). Interior plaquettes have 6 qubits;
+boundary plaquettes have 4.
 
 ```python
 from qens.codes.color import ColorCode
 
 code = ColorCode(distance=5, lattice_type="4.8.8")
 
-print(code.name)             # Color-4.8.8-5
-print(code.num_data_qubits)  # 19
-print(code.code_distance)    # 5
+print(code.name)                  # Color-4.8.8-5
+print(code.num_data_qubits)       # 19
+print(code.num_ancilla_qubits)    # 7
+print(code.code_distance)         # 5
+print(code.supports_transversal_clifford)  # True
+
+# Color codes have paired X and Z stabilizers on the same plaquettes
+stabs = code.stabilizer_generators()
+x_stabs = [s for s in stabs if s.stabilizer_type == "X"]
+z_stabs = [s for s in stabs if s.stabilizer_type == "Z"]
+print(f"X stabilizers: {len(x_stabs)}, Z stabilizers: {len(z_stabs)}")
+# X stabilizers: 7, Z stabilizers: 7
 ```
+
+### 6.6.6 Lattice (Honeycomb in Triangle)
+
+The 6.6.6 lattice builds a honeycomb lattice within an equilateral triangular
+region. Flat-top hexagonal cells are placed on a triangular grid with basis
+vectors `a1 = (1.5, sqrt(3)/2)` and `a2 = (0, sqrt(3))`. The triangle has
+side length `3t`.
+
+Data qubits sit at the vertices of these hexagonal cells. Interior cells
+produce 6-qubit plaquettes; cells clipped to the triangle boundary produce
+4-qubit plaquettes. The result is a proper tiling of the triangular region
+with 3-colorable hexagonal faces.
+
+```python
+from qens.codes.color import ColorCode
+
+code = ColorCode(distance=7, lattice_type="6.6.6")
+
+print(code.name)                  # Color-6.6.6-7
+print(code.num_data_qubits)       # 36
+print(code.num_ancilla_qubits)    # 16
+print(code.supports_transversal_clifford)  # True
+
+# Inspect plaquette sizes
+plaq_sizes = [len(p) for p in code._plaquettes]
+print(f"Plaquette sizes: {sorted(set(plaq_sizes))}")
+# Plaquette sizes: [4, 6]
+```
+
+### Visualizing Color Codes
+
+Color codes are rendered with bold 3-colored plaquette fills, black outlines,
+and small black dot markers for data qubits. The style matches standard QEC
+literature conventions.
+
+```python
+from qens import ColorCode, draw_lattice
+
+# 6.6.6 honeycomb in triangle
+code = ColorCode(distance=7, lattice_type="6.6.6")
+fig = draw_lattice(code, title="6.6.6 Color Code (d=7)")
+fig.save("color_666_d7.png")
+fig.close()
+
+# 4.8.8 hexagonal grid
+code = ColorCode(distance=5, lattice_type="4.8.8")
+fig = draw_lattice(code, title="4.8.8 Color Code (d=5)")
+fig.save("color_488_d5.png")
+fig.close()
+```
+
+### Error and Syndrome Overlays
+
+```python
+import numpy as np
+from qens import ColorCode, DepolarizingError, NoisySampler, draw_lattice
+
+code = ColorCode(distance=5, lattice_type="6.6.6")
+sampler = NoisySampler(seed=42)
+result = sampler.sample_errors(code, DepolarizingError(p=0.10), shots=1)
+
+error = result.sample_error(0)
+syndrome = result.sample_syndrome(0)
+
+fig = draw_lattice(code, syndrome=syndrome, error=error,
+                   title="6.6.6 d=5 — Error + Syndrome")
+fig.save("color_code_with_errors.png")
+fig.close()
+```
+
+When an error overlay is provided, affected data qubits are colored by error
+type (X, Y, or Z). Active syndrome bits are shown as red star markers. The
+legend/key updates automatically to reflect which overlays are present.
 
 ---
 

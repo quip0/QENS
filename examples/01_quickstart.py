@@ -46,6 +46,6 @@ print(f"Logical error rate: {result.logical_error_rate:.4f}")
 
 # --- 5. Save a lattice visualization ---
 fig_handle = draw_lattice(code, title="Repetition Code (d=3)")
-fig_handle.save("images/quickstart_lattice.png")
+fig_handle.save("output/quickstart_lattice.png")
 fig_handle.close()
-print("\nLattice saved to images/quickstart_lattice.png")
+print("\nLattice saved to output/quickstart_lattice.png")

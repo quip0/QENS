@@ -104,6 +104,12 @@ fig.save("basic_circuit.png")
 fig.close()
 ```
 
+Here is an example syndrome extraction circuit for a distance-3 surface code:
+
+<p align="center">
+  <img src="../images/syndrome_circuit.png" width="600" alt="Syndrome extraction circuit">
+</p>
+
 ### Circuit with Noise Annotations
 
 When you pass a `noise_model` and set `highlight_errors=True`, gates where the
@@ -197,7 +203,18 @@ fig.save("rep_lattice.png")
 fig.close()
 ```
 
+<p align="center">
+  <img src="../images/rep_d5_lattice.png" width="250" alt="Repetition code d=5 lattice">
+</p>
+
 ### Surface Code Lattice
+
+Surface codes render in the standard QEC style: stabilizer plaquettes are
+drawn as filled polygons built from the data qubit vertex positions.
+X-stabilizer plaquettes are **tomato** (red-orange), Z-stabilizer plaquettes
+are **yellowgreen**. Data qubits appear as small black dots at the vertices.
+Boundary plaquettes (weight-2 stabilizers) appear as open diamond outlines
+at the lattice edges.
 
 ```python
 import matplotlib
@@ -206,11 +223,24 @@ matplotlib.use("Agg")
 from qens.codes.surface import SurfaceCode
 from qens import draw_lattice
 
-code = SurfaceCode(distance=3)
-fig = draw_lattice(code, title="Surface Code d=3")
+code = SurfaceCode(distance=5)
+fig = draw_lattice(code, title="Surface Code d=5")
 fig.save("surface_lattice.png")
 fig.close()
 ```
+
+<p align="center">
+  <img src="../images/clean_d5.png" width="300" alt="Surface code d=5 lattice">
+</p>
+
+When `syndrome` or `error` overlays are provided:
+
+- **Syndrome**: active stabilizers are marked with red stars (`★`) at the
+  ancilla position inside the plaquette.
+- **Errors**: affected data qubits change color — X errors are red, Y errors
+  are purple, Z errors are blue — and their marker size increases.
+
+A legend/key is drawn outside the plot area listing the active overlays.
 
 ### Lattice with Syndrome Overlay
 
@@ -235,6 +265,10 @@ fig = draw_lattice(code, syndrome=syndrome, title="d=3 Surface Code with Syndrom
 fig.save("lattice_with_syndrome.png")
 fig.close()
 ```
+
+<p align="center">
+  <img src="../images/surface_d3_syndrome.png" width="250" alt="Surface code d=3 with syndrome">
+</p>
 
 ### Lattice with Error Overlay
 
@@ -261,6 +295,56 @@ fig = draw_lattice(code, syndrome=syndrome, error=error, title="Error Overlay")
 fig.save("lattice_with_errors.png")
 fig.close()
 ```
+
+### Color Code Lattice
+
+Color codes use a dedicated rendering path with bold 3-colored plaquette
+fills, black polygon outlines, small black dot markers for data qubits,
+and offset index labels. The visualization automatically detects `ColorCode`
+instances and switches to this style.
+
+```python
+import matplotlib
+matplotlib.use("Agg")
+
+from qens.codes.color import ColorCode
+from qens import draw_lattice
+
+# 6.6.6 honeycomb in triangle — the flagship visualization
+code = ColorCode(distance=7, lattice_type="6.6.6")
+fig = draw_lattice(code, title="6.6.6 Color Code (d=7)")
+fig.save("color_code_lattice.png")
+fig.close()
+```
+
+The three plaquette colors (tomato, yellowgreen, steelblue) are assigned by a
+greedy 3-coloring algorithm that ensures adjacent plaquettes always get
+different colors. These colors are configurable via `QENSStyle.color_code_plaquette_colors`.
+
+#### Color Code with Errors and Syndromes
+
+```python
+import matplotlib
+matplotlib.use("Agg")
+
+from qens import ColorCode, DepolarizingError, NoisySampler, draw_lattice
+
+code = ColorCode(distance=5, lattice_type="6.6.6")
+sampler = NoisySampler(seed=42)
+result = sampler.sample_errors(code, DepolarizingError(p=0.10), shots=1)
+
+fig = draw_lattice(
+    code,
+    syndrome=result.sample_syndrome(0),
+    error=result.sample_error(0),
+    title="6.6.6 d=5 — Error + Syndrome",
+)
+fig.save("color_code_with_errors.png")
+fig.close()
+```
+
+When overlays are present, the legend/key updates to show error type colors
+(X, Y, Z) and active syndrome markers (red stars).
 
 ---
 
@@ -329,6 +413,10 @@ fig.save("decoding_graph.png")
 fig.close()
 ```
 
+<p align="center">
+  <img src="../images/decoding_graph.png" width="400" alt="MWPM decoding graph with matching">
+</p>
+
 ---
 
 ## Statistical Plots
@@ -377,6 +465,10 @@ fig.save("threshold.png")
 fig.close()
 ```
 
+<p align="center">
+  <img src="../images/threshold_plot.png" width="400" alt="Threshold plot">
+</p>
+
 ### Logical Rates Bar Chart
 
 ```python
@@ -405,6 +497,10 @@ fig = plot_logical_rates(distances, rates, title="Logical Error Rate at p=0.01")
 fig.save("logical_rates.png")
 fig.close()
 ```
+
+<p align="center">
+  <img src="../images/logical_rates.png" width="350" alt="Logical error rates bar chart">
+</p>
 
 ### Histogram
 
@@ -475,10 +571,11 @@ All visualization functions accept an optional `style` parameter. The
 | `background_color` | `"#FFFFFF"` | Figure background color. |
 | `text_color` | `"#2C3E50"` | Color for text labels. |
 | `grid_color` | `"#ECF0F1"` | Color for grid lines and lattice edges. |
-| `qubit_size` | `300.0` | Marker size for data qubits. |
-| `ancilla_size` | `200.0` | Marker size for ancilla qubits. |
-| `edge_width` | `1.5` | Line width for lattice edges. |
-| `font_size` | `9.0` | Base font size for labels. |
+| `color_code_plaquette_colors` | `("tomato", "yellowgreen", "steelblue")` | 3-color palette for color code plaquettes. |
+| `qubit_size` | `450.0` | Marker size for data qubits. |
+| `ancilla_size` | `320.0` | Marker size for ancilla qubits. |
+| `edge_width` | `2.0` | Line width for lattice edges. |
+| `font_size` | `11.0` | Base font size for labels. |
 | `distance_colors` | 8-color tuple | Color cycle for threshold plot distance lines. |
 
 ### Example: Dark Theme
