@@ -40,6 +40,16 @@ result = qens.ThresholdExperiment.single_point(
 print(f"Logical error rate: {result.logical_error_rate:.4f}")
 ```
 
+## <img src="images/logo/iconlogo.svg" width="28" alt="" align="top"> Tutorials
+
+Interactive Jupyter notebooks — the fastest way to get hands-on:
+
+| Notebook | Description |
+|----------|-------------|
+| [01 — Quickstart](docs/notebooks/01_quickstart.ipynb) | End-to-end first simulation: code → noise → decoder → Monte Carlo → threshold |
+| [02 — Syndrome Extraction](docs/notebooks/02_syndrome_extraction.ipynb) | How stabilizers detect errors; CSS structure; logical errors; noisy extraction |
+| [03 — Decoder Comparison](docs/notebooks/03_decoder_comparison.ipynb) | Benchmarking lookup / MWPM / union-find: LER, timing, metadata |
+
 ## <img src="images/logo/iconlogo.svg" width="28" alt="" align="top"> Documentation
 
 Full documentation is in the [`docs/`](docs/) directory:
@@ -51,6 +61,8 @@ Full documentation is in the [`docs/`](docs/) directory:
 | [Error Models](docs/error-models.md) | All 10 noise models with examples |
 | [QEC Codes](docs/codes.md) | Repetition, surface, and color codes |
 | [Decoders](docs/decoders.md) | Lookup, MWPM, and union-find decoders |
+| [Syndrome Extraction Guide](docs/syndrome-extraction.md) | Stabilizer measurement, XOR linearity, CSS syndromes, logical errors |
+| [Decoder Comparison Guide](docs/decoder-comparison.md) | When to use each decoder and how they trade off |
 | [Simulation](docs/simulation.md) | Monte Carlo sampling, threshold sweeps, Pauli frame simulator |
 | [Visualization](docs/visualization.md) | Circuit diagrams, lattice views, decoding graphs, plots |
 | [Extending QENS](docs/extending.md) | Custom error models, codes, decoders, visualizers |
@@ -114,9 +126,11 @@ qens/
 
 ## Examples
 
+For interactive walkthroughs, open the [tutorial notebooks](docs/notebooks/).
+
+Script-based examples for quick CLI use:
+
 ```bash
-python3 examples/01_quickstart.py              # Basic workflow
-python3 examples/02_surface_code_threshold.py   # Threshold sweep
 python3 examples/03_custom_noise_model.py       # Composed noise + visualization
 python3 examples/04_visualization_gallery.py    # All visualization types
 ```
