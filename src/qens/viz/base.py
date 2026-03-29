@@ -3,6 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from io import BytesIO
+from pathlib import Path
 from typing import Any
 
 import matplotlib.figure
@@ -17,6 +18,7 @@ class FigureHandle:
     axes: Any  # matplotlib Axes or array of Axes
 
     def save(self, path: str, dpi: int = 200, **kwargs: Any) -> None:
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.fig.savefig(path, dpi=dpi, bbox_inches="tight", **kwargs)
 
     def show(self) -> None:
