@@ -41,6 +41,7 @@ class NoisySampler:
         errors: list[PauliString] = []
 
         for _ in range(shots):
+            noise_model.reset()
             error = noise_model.sample_errors(nd, all_qubits, self._rng)
             syndrome = code.compute_syndrome(error)
             syndromes.append(syndrome)
@@ -74,6 +75,7 @@ class NoisySampler:
         logical_errors: list[bool] = []
 
         for _ in range(shots):
+            noise_model.reset()
             error = noise_model.sample_errors(nd, all_qubits, self._rng)
             syndrome = code.compute_syndrome(error)
 

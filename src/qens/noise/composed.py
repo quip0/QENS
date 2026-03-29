@@ -53,6 +53,11 @@ class ComposedNoiseModel(ErrorModel):
                 combined, _ = pauli_string_multiply(combined, error)
         return combined
 
+    def reset(self) -> None:
+        """Reset all component models."""
+        for model in self.models:
+            model.reset()
+
     def applies_to(self, gate: Gate) -> bool:
         return any(m.applies_to(gate) for m in self.models)
 

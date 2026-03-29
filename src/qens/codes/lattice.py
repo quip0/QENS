@@ -61,7 +61,7 @@ class Lattice:
         return list(self._edges)
 
     def neighbors(self, index: int) -> list[int]:
-        return list(self._adjacency.get(index, []))
+        return list(self._adjacency[index])
 
     def data_nodes(self) -> list[LatticeNode]:
         return [n for n in self._nodes.values() if n.role == "data"]

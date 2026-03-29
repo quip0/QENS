@@ -59,6 +59,11 @@ class Circuit:
 
     def append_gate(self, gate: Gate) -> None:
         """Append a gate. Creates a new moment if the last one uses overlapping qubits."""
+        for q in gate.qubits:
+            if not (0 <= q < self._num_qubits):
+                raise ValueError(
+                    f"Qubit index {q} is out of range for circuit with {self._num_qubits} qubits"
+                )
         gate_qubits = set(gate.qubits)
         if self._moments and not gate_qubits & self._moments[-1].qubits_used:
             self._moments[-1].add(gate)

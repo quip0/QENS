@@ -116,7 +116,7 @@ Defined in `qens/noise/base.py`. The contract:
 | `applies_to(gate)` | No | Filter which gates this model targets (default: all) |
 | `__repr__()` | Yes | String representation |
 
-Error models are stateless except for `LeakageError`, which tracks leaked qubits.
+Most error models are stateless. `LeakageError` is the exception: it tracks which qubits have leaked into the non-computational subspace. `NoisySampler` calls `noise_model.reset()` at the start of **every shot** to guarantee independence between Monte Carlo samples. Stateless models inherit a no-op `reset()` from `ErrorModel` and are unaffected. `ComposedNoiseModel.reset()` propagates to all component models.
 
 ### QECCode
 
@@ -193,6 +193,7 @@ Duplicate names raise `ValueError`. Missing names raise `KeyError` with a messag
 
 ```
 For each shot:
+    0. ErrorModel.reset()              --> (clears per-shot state, e.g. LeakageError)
     1. ErrorModel.sample_errors()      --> PauliString (the error)
     2. QECCode.compute_syndrome()      --> Syndrome (binary vector)
     3. Decoder.decode()                --> DecoderResult (correction)

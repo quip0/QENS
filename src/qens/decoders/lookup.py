@@ -32,23 +32,16 @@ class LookupTableDecoder(Decoder):
         max_weight = self._code.code_distance // 2
         for weight in range(max_weight + 1):
             for positions in itertools.combinations(range(nd), weight):
-                # For each position, try X, Y, Z
+                # For each position, try X, Y, Z (repeat=0 yields one empty tuple,
+                # so weight=0 / identity error is handled naturally here)
                 for paulis in itertools.product([PauliOp.X, PauliOp.Y, PauliOp.Z], repeat=weight):
-                    if weight == 0:
-                        error = np.zeros(nd, dtype=np.uint8)
-                        syndrome = self._code.compute_syndrome(error)
-                        key = syndrome.tobytes()
-                        if key not in best:
-                            best[key] = (0, error.copy())
-                        break
-                    else:
-                        error = np.zeros(nd, dtype=np.uint8)
-                        for pos, pauli in zip(positions, paulis):
-                            error[pos] = pauli
-                        syndrome = self._code.compute_syndrome(error)
-                        key = syndrome.tobytes()
-                        if key not in best or weight < best[key][0]:
-                            best[key] = (weight, error.copy())
+                    error = np.zeros(nd, dtype=np.uint8)
+                    for pos, pauli in zip(positions, paulis):
+                        error[pos] = pauli
+                    syndrome = self._code.compute_syndrome(error)
+                    key = syndrome.tobytes()
+                    if key not in best or weight < best[key][0]:
+                        best[key] = (weight, error.copy())
 
         self._table = {k: v[1] for k, v in best.items()}
         super().precompute()

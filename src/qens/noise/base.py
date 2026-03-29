@@ -56,5 +56,13 @@ class ErrorModel(ABC):
         """
         return True
 
+    def reset(self) -> None:
+        """Reset any per-shot mutable state.
+
+        Called by NoisySampler at the start of every shot so that stateful
+        models (e.g. LeakageError) begin each shot with a clean slate.
+        Stateless models can ignore this (the default no-op is sufficient).
+        """
+
     @abstractmethod
     def __repr__(self) -> str: ...

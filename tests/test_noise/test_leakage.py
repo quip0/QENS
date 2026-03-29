@@ -47,3 +47,9 @@ class TestLeakageError:
 
     def test_repr(self):
         assert "LeakageError" in repr(LeakageError(p_leak=0.01, p_relax=0.1))
+
+    def test_reset_is_idempotent_when_clean(self):
+        model = LeakageError(p_leak=0.1)
+        model.reset()
+        model.reset()
+        assert len(model.leaked_qubits) == 0
