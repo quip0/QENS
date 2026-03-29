@@ -46,6 +46,36 @@ class TestColorCode3:
         assert circuit.depth > 0
 
 
+class TestColorCode5:
+    """Smoke tests for d=5 color code to catch regressions at larger distances."""
+
+    def test_creates_valid_code(self):
+        code = ColorCode(5)
+        assert code.num_data_qubits > 0
+        assert code.code_distance == 5
+
+    def test_css_property(self):
+        code = ColorCode(5)
+        stabs = code.stabilizer_generators()
+        x_stabs = [s for s in stabs if s.stabilizer_type == "X"]
+        z_stabs = [s for s in stabs if s.stabilizer_type == "Z"]
+        assert len(x_stabs) == len(z_stabs)
+        x_supports = [frozenset(s.qubits) for s in x_stabs]
+        z_supports = [frozenset(s.qubits) for s in z_stabs]
+        assert sorted(x_supports, key=sorted) == sorted(z_supports, key=sorted)
+
+    def test_logical_operators(self):
+        code = ColorCode(5)
+        logicals = code.logical_operators()
+        assert len(logicals) == 2
+
+    def test_check_matrix_shape(self):
+        code = ColorCode(5)
+        H = code.check_matrix()
+        stabs = code.stabilizer_generators()
+        assert H.shape == (len(stabs), code.num_data_qubits)
+
+
 class TestColorCodeEdgeCases:
     def test_distance_less_than_3_raises(self):
         with pytest.raises(ValueError):

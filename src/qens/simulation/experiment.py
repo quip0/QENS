@@ -40,6 +40,22 @@ class ThresholdExperiment:
         shots_per_point: int = 10_000,
         seed: int | None = None,
     ) -> None:
+        """Create a threshold sweep experiment.
+
+        Args:
+            code_class: The QECCode subclass to instantiate (e.g. SurfaceCode).
+                        Called as ``code_class(d)`` for each distance ``d``.
+            distances: List of code distances to sweep over (e.g. [3, 5, 7]).
+            physical_error_rates: List of physical error rates to test
+                                   (e.g. [0.001, 0.005, 0.01]).
+            noise_model_factory: Callable that accepts a physical error rate and
+                                  returns an :class:`ErrorModel` instance.
+            decoder_class: The :class:`Decoder` subclass to use.  Instantiated as
+                           ``decoder_class(code)`` for each distance.
+            shots_per_point: Number of Monte Carlo shots per (distance, rate) pair.
+                             Defaults to 10 000.
+            seed: Optional RNG seed for reproducibility.
+        """
         self.code_class = code_class
         self.distances = distances
         self.physical_error_rates = physical_error_rates

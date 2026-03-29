@@ -42,6 +42,7 @@ class ColorCode(QECCode):
         self._data_coords: list[tuple[float, ...]] = []
         self._plaquettes: list[list[int]] = []
         self._coord_to_index: dict[tuple[float, ...], int] = {}
+        self._check_matrix_cache: np.ndarray | None = None
         self._lattice = self._build_layout()
         self._validate_css()
 
@@ -350,12 +351,15 @@ class ColorCode(QECCode):
         return best
 
     def check_matrix(self) -> np.ndarray:
+        if self._check_matrix_cache is not None:
+            return self._check_matrix_cache
         stabs = self.stabilizer_generators()
         nd = self.num_data_qubits
         H = np.zeros((len(stabs), nd), dtype=np.uint8)
         for i, stab in enumerate(stabs):
             for q in stab.qubits:
                 H[i, q] = 1
+        self._check_matrix_cache = H
         return H
 
     def syndrome_circuit(self, rounds: int = 1) -> Circuit:

@@ -3,6 +3,24 @@
 Demonstrates how to combine multiple error sources into a single noise
 model, build a syndrome extraction circuit, visualize it with error
 annotations, and inspect the decoding graph after a single shot.
+
+Note on stateful noise models (LeakageError)
+--------------------------------------------
+Most error models are stateless. ``LeakageError`` is the exception: it tracks
+which qubits have leaked into the non-computational subspace across calls to
+``sample_errors()``.  ``NoisySampler`` calls ``noise_model.reset()`` at the
+**start of every shot** automatically, so each shot begins with a clean slate.
+``ComposedNoiseModel.reset()`` propagates to all component models, so composing
+a ``LeakageError`` inside a ``ComposedNoiseModel`` also works correctly.
+
+Example with LeakageError::
+
+    from qens import LeakageError, NoisySampler, RepetitionCode
+
+    code  = RepetitionCode(3)
+    noise = LeakageError(p_leak=0.02, p_relax=0.5)
+    # NoisySampler.reset() is called before each shot — no manual reset needed.
+    result = NoisySampler(seed=0).sample_errors(code, noise, shots=1000)
 """
 import matplotlib
 matplotlib.use("Agg")
