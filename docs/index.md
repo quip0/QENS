@@ -47,11 +47,19 @@ print(f"Logical error rate: {result.logical_error_rate:.4f}")
 
 - [Core Concepts](concepts.md) -- Quantum error correction, Pauli errors, CSS codes, Pauli frame simulation
 
+### Tutorials
+
+- [Tutorial 1: Quickstart](notebooks/01_quickstart.ipynb) -- Your first QEC simulation end-to-end
+- [Tutorial 2: Syndrome Extraction](notebooks/02_syndrome_extraction.ipynb) -- How stabilizers detect errors
+- [Tutorial 3: Decoder Comparison](notebooks/03_decoder_comparison.ipynb) -- Benchmarking all three decoders
+
 ### User Guides
 
 - [Error Models](error-models.md) -- Pauli, measurement, gate, correlated, leakage, and composed noise models
 - [QEC Codes](codes.md) -- Repetition, surface, and color codes; stabilizers, syndromes, and lattices
 - [Decoders](decoders.md) -- Lookup table, MWPM, and union-find decoders
+- [Syndrome Extraction Guide](syndrome-extraction.md) -- Deep dive into stabilizer measurement and syndrome patterns
+- [Decoder Comparison Guide](decoder-comparison.md) -- When to use each decoder and how they differ
 - [Simulation](simulation.md) -- Monte Carlo sampling, threshold sweeps, Pauli frame simulator
 - [Visualization](visualization.md) -- Circuit diagrams, lattice views, decoding graphs, statistical plots
 
